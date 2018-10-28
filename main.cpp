@@ -70,7 +70,7 @@ public:
 				return (User*)*user;
 			}
 		}
-		UserAlreadyExistsException ex("Username or Password isn't correct!");
+		PassORUserExecption ex("Username or Password isn't correct!");
 		throw ex;
 	}
 
@@ -86,7 +86,12 @@ public:
 		users->push_back(new User(username, password, UserType::MEMBER));
 	}
 	void deleteAccount(vector<AbstractUser*> *users) {
-
+		for (auto user = users->begin(); user != users->end(); user++) {
+			if ((*user)->username == usernameUser) {
+				users->erase(user);
+				break;
+			}
+		}
 	}
 	string usernameUser;
 };
@@ -102,10 +107,7 @@ public:
 	vector<AbstractUser *> appUsers;
 
 	AppDatabase() { //Load initial data
-		appUsers.push_back(new User("admin",
-			"admin" /* password is unsafe! for test only */,
-			UserType::ADMIN)
-		);
+		appUsers.push_back(new User("admin", "NIMDA", UserType::ADMIN));
 	}
 };
 
@@ -147,6 +149,7 @@ int main() {
 				cin >> password;
 				try {
 					User::signup(&appDatabase.appUsers, username, password);
+					cout << "Account successfully created." << endl;
 				}
 				catch (UserAlreadyExistsException e) {
 					cout << "Error:" << e.getMessage() << endl;
@@ -169,7 +172,7 @@ int main() {
 			switch (choice) {
 			case 'd': {
 				loggedInUser->deleteAccount(&appDatabase.appUsers);
-				cout << "Account successfully deleted";
+				cout << "Account successfully deleted" << endl;
 				loggedInUser = nullptr;
 				menuState = MenuState::START;
 				break;
